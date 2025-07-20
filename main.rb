@@ -39,7 +39,21 @@ post '/event' do
     status 201
     return {"origin": {"id": origin, "balance": settings.accounts[origin]}}.to_json
   elsif event_type == 'transfer'
-    # TODO
+    origin = json_params['origin']
+    amount = json_params['amount'].to_i
+    destination = json_params['destination']
+
+    if !settings.accounts.key?(origin)
+      status 404
+      return '0'
+    end
+
+    settings.accounts[origin] -= amount
+    settings.accounts[destination] ||= 0
+    settings.accounts[destination] += amount
+    status 201
+    return {"origin": {"id": origin, "balance": settings.accounts[origin]}, "destination": {"id": destination, "balance": settings.accounts[destination]}}.to_json  
+
   else
     status 400
     return 'Invalid event type'
