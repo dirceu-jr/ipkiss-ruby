@@ -9,7 +9,13 @@ post '/reset' do
 end
 
 get '/balance' do
-  ''
+  account_id = params['account_id']
+  if settings.accounts.key?(account_id)
+    return settings.accounts[account_id].to_s
+  else
+    status 404
+    return '0'
+  end
 end
 
 post '/event' do
