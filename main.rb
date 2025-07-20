@@ -44,6 +44,7 @@ post '/event' do
     settings.accounts[origin] -= amount
     status 201
     return {"origin": {"id": origin, "balance": settings.accounts[origin]}}.to_json
+
   elsif event_type == 'transfer'
     origin = json_params['origin']
     amount = json_params['amount'].to_i
