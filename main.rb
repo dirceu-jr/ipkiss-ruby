@@ -1,18 +1,43 @@
 require 'sinatra'
 
 set :environment, :production
-
-@accounts = {}
+set :accounts, {}
 
 post '/reset' do
-  @accounts = {}
+  settings.accounts.clear
   'OK'
 end
 
-post '/balance' do
+get '/balance' do
   ''
 end
 
 post '/event' do
-  ''
+  json_params = JSON.parse(request.body.read)
+  event_type = json_params['type']
+
+  if event_type == 'deposit'
+    destination = json_params['destination']
+    amount = json_params['amount'].to_i
+
+    if destination.nil? || amount <= 0
+      status 400
+      return 'Invalid parameters'
+    end
+
+    p settings.accounts
+    settings.accounts[destination] ||= 0
+    settings.accounts[destination] += amount
+
+    status 201
+    return {"destination": {"id": destination, "balance": settings.accounts[destination]}}.to_json
+
+  elsif event_type == 'withdraw'
+    # TODO
+  elsif event_type == 'transfer'
+    # TODO
+  else
+    status 400
+    return 'Invalid event type'
+  end
 end
