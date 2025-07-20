@@ -20,12 +20,6 @@ post '/event' do
     destination = json_params['destination']
     amount = json_params['amount'].to_i
 
-    if destination.nil? || amount <= 0
-      status 400
-      return 'Invalid parameters'
-    end
-
-    p settings.accounts
     settings.accounts[destination] ||= 0
     settings.accounts[destination] += amount
 
@@ -33,7 +27,17 @@ post '/event' do
     return {"destination": {"id": destination, "balance": settings.accounts[destination]}}.to_json
 
   elsif event_type == 'withdraw'
-    # TODO
+    origin = json_params['origin']
+    amount = json_params['amount'].to_i
+
+    if !settings.accounts.key?(origin)
+      status 404
+      return '0'
+    end
+
+    settings.accounts[origin] -= amount
+    status 201
+    return {"origin": {"id": origin, "balance": settings.accounts[origin]}}.to_json
   elsif event_type == 'transfer'
     # TODO
   else
